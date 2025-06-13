@@ -7,20 +7,13 @@ const App: React.FC = () => {
   const [showAlignment, setShowAlignment] = useState(false);
 
   const aminoAcidTypes: { [key: string]: string } = {
-    // Цистеин - C
     'C': 'cysteine',
-    // Гидрофобные - A, I, L, M, F, W, Y, V, P
     'A': 'hydrophobic', 'I': 'hydrophobic', 'L': 'hydrophobic', 'M': 'hydrophobic',
     'F': 'hydrophobic', 'W': 'hydrophobic', 'Y': 'hydrophobic', 'V': 'hydrophobic', 'P': 'hydrophobic',
-    // Глицин - G
     'G': 'glycine',
-    // Отрицательно заряженные - D, E
     'D': 'negative', 'E': 'negative',
-    // Положительно заряженные - K, R
     'K': 'positive', 'R': 'positive',
-    // Полярные незаряженные - S, T, H, Q, N
     'S': 'polar', 'T': 'polar', 'H': 'polar', 'Q': 'polar', 'N': 'polar',
-    // Спейс
     '-': 'space'
   };
 
@@ -30,7 +23,7 @@ const App: React.FC = () => {
     return value.split('').every(char => validAminoAcids.includes(char.toUpperCase()));
   };
 
-  const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     setShowAlignment(false);
     if (evt.target.name === 'sequenceOne') {
       setSequenceOne(evt.target.value)
@@ -39,16 +32,14 @@ const App: React.FC = () => {
       setSequenceTwo(evt.target.value)
     }
   }
-  
+
   const handleSubmit = () => {
     const newErrors: string[] = [];
 
-    // Проверка обязательности заполнения
     if (!sequenceOne.trim() || !sequenceTwo.trim()) {
       newErrors.push('Обе последовательности обязательны для заполнения');
     }
 
-    // Проверка валидности символов
     if (sequenceOne && !validateInput(sequenceOne)) {
       newErrors.push('Первая последовательность содержит недопустимые символы');
     }
@@ -56,7 +47,6 @@ const App: React.FC = () => {
       newErrors.push('Вторая последовательность содержит недопустимые символы');
     }
 
-    // Проверка одинаковой длины
     if (sequenceOne && sequenceTwo && sequenceOne.length !== sequenceTwo.length) {
       newErrors.push('Последовательности должны быть одинаковой длины');
     }
@@ -76,7 +66,6 @@ const App: React.FC = () => {
     const aminoClass = `sequence__char_amino_${aminoType}`;
     
     if (isSecond) {
-      // Для второй последовательности показываем цвет только если символы различаются
       if (char !== otherChar) {
         return `${baseClass} ${aminoClass}`;
       }
@@ -86,21 +75,62 @@ const App: React.FC = () => {
     return `${baseClass} ${aminoClass}`;
   };
 
-  const renderSequence = (sequence: string, isSecond: boolean = false) => {
-    const upperSequence = sequence.toUpperCase();
-    const otherSequence = isSecond ? sequenceOne.toUpperCase() : sequenceTwo.toUpperCase();
+  const renderAlignment = () => {
+    const upperSequenceOne = sequenceOne.toUpperCase();
+    const upperSequenceTwo = sequenceTwo.toUpperCase();
     
-    return upperSequence.split('').map((char, index) => {
-      const charClass = getCharClass(char, isSecond, otherSequence[index]);
+        const getCharsPerLine = () => {
+      if (window.innerWidth <= 320) return 10;
+      if (window.innerWidth <= 480) return 15;
+      if (window.innerWidth <= 768) return 20;
+      return 30;
+    };
+    
+    const charsPerLine = getCharsPerLine();
+    const blocks = [];
+    
+    for (let i = 0; i < upperSequenceOne.length; i += charsPerLine) {
+      const block1 = upperSequenceOne.slice(i, i + charsPerLine);
+      const block2 = upperSequenceTwo.slice(i, i + charsPerLine);
       
-      return (
-        <span key={index} className={charClass}>
-          {char}
-        </span>
-      );
-    });
+      blocks.push({
+        sequenceOne: block1,
+        sequenceTwo: block2,
+        startIndex: i
+      });
+    }
+    
+    return blocks.map((block, blockIndex) => (
+      <div key={blockIndex} className='sequence-block'>
+        <div className='sequence'>
+          {block.sequenceOne.split('').map((char, charIndex) => {
+            const globalIndex = block.startIndex + charIndex;
+            const charClass = getCharClass(char, false);
+            
+            return (
+              <span key={globalIndex} className={charClass}>
+                {char}
+              </span>
+            );
+          })}
+        </div>
+        
+        <div className='sequence sequence_type_second'>
+          {block.sequenceTwo.split('').map((char, charIndex) => {
+            const globalIndex = block.startIndex + charIndex;
+            const otherChar = block.sequenceOne[charIndex];
+            const charClass = getCharClass(char, true, otherChar);
+            
+            return (
+              <span key={globalIndex} className={charClass}>
+                {char}
+              </span>
+            );
+          })}
+        </div>
+      </div>
+    ));
   };
-
 
   return (
     <div className='page'>
@@ -163,12 +193,7 @@ const App: React.FC = () => {
               Результат выравнивания последовательностей:
             </h2>
             <div className='alignment__display'>
-              <div className='sequence'>
-                {renderSequence(sequenceOne)}
-              </div>
-              <div className='sequence'>
-                {renderSequence(sequenceTwo, true)}
-              </div>
+              {renderAlignment()}
             </div>
           </div>
         )}

@@ -55,6 +55,7 @@ body {
   border-radius: 10px;
   font-size: 16px;
   transition: border-color 0.3s ease;
+  box-sizing: border-box;
 }
 
 .input:focus {
@@ -87,6 +88,7 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  box-sizing: border-box;
 }
 
 .button:hover {
@@ -130,11 +132,21 @@ body {
   line-height: 1.4;
 }
 
+.sequence-block {
+  margin-bottom: 16px;
+}
+
+.sequence-block:last-child {
+  margin-bottom: 0;
+}
+
+
 .sequence {
   margin-bottom: 4px;
   word-break: break-all;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  line-height: 1.4;
 }
 
 .sequence__char {
@@ -177,6 +189,7 @@ body {
 .sequence__char_amino_space {
   background-color: #FFFFFF;
 }
+
 
 .legend {
   margin-top: 40px;
