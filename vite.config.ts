@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/amino-acid-tool-for-biocad/', // 👈 Замените на название вашего репозитория
+  base: '/amino-acid-tool-for-biocad/',
   build: {
     outDir: 'dist',
     sourcemap: true,
