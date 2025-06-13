@@ -194,13 +194,13 @@ body {
 
 .legend__list {
   display: grid;
-  space: 8px;
+  gap: 8px;
 }
 
 .legend__item {
   display: flex;
   align-items: center;
-  space: 10px;
+  gap: 10px;
 }
 
 .legend__color {
